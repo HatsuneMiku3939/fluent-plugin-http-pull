@@ -47,19 +47,24 @@ module Fluent
         while !@shutdown
           ts = Time.now.to_f
 
-          res = RestClient.get(@url)
-          if @status_only
-            router.emit(@tag, Engine.now, {
-              "url" => @url,
-              "status" => res.code
-            })
-          else
-            router.emit(@tag, Engine.now, {
-              "url" => @url,
-              "status" => res.code,
-              "message" => JSON.parse(res.body)
-            })
+          log = { "url" => @url }
+
+          begin
+            res = RestClient.get(@url)
+            log["status"] = res.code
+            log["body"] = res.body
+          rescue RestClient::ExceptionWithResponse => err
+            log["status"] = err.code
+            log["error"] = err.message
+          rescue Exception => err
+            log["status"] = 0
+            log["error"] = err.message
           end
+
+          log["message"] = JSON.parse(log["body"]) if !@status_only && log["body"] != nil
+          log.delete("body")
+
+          router.emit(@tag, Engine.now, log)
 
           te = Time.now.to_f
           delay = @interval - (te - ts)
