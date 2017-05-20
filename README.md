@@ -1,5 +1,9 @@
 # fluent-plugin-http-pull
 
+[![Build Status](https://travis-ci.org/HatsuneMiku3939/fluent-plugin-http-pull.svg?branch=master)](https://travis-ci.org/HatsuneMiku3939/fluent-plugin-http-pull)
+[![Gem Version](https://badge.fury.io/rb/fluent-plugin-http-pull.svg)](https://badge.fury.io/rb/fluent-plugin-http-pull)
+
+
 [Fluentd](http://fluentd.org/) input plugin to pull log from rest api.
 
 Many of modern server application offer status reporting API via http (even 'fluentd' too). This plugin will help to gathering status log from these status api.
