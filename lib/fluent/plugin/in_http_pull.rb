@@ -21,7 +21,7 @@ module Fluent
     class HttpPullInput < Fluent::Plugin::Input
       Fluent::Plugin.register_input("http_pull", self)
 
-      helpers :timer
+      helpers :timer, :parser, :compat_parameters
 
       def initialize
         super
@@ -29,17 +29,20 @@ module Fluent
 
       desc 'The tag of the event.'
       config_param :tag, :string
-      desc 'The uri of monitoring target'
+      desc 'The url of monitoring target'
       config_param :url, :string
       desc 'The interval time between periodic request'
       config_param :interval, :time
       desc 'status_only'
       config_param :status_only, :bool, default: false
       desc 'timeout second of each request'
-      config_param :timeout, :integer, default: 10
+      config_param :timeout, :time, default: 10
 
       def configure(conf)
+        compat_parameters_convert(conf, :parser)
         super
+
+        @parser = parser_create unless @status_only
       end
 
       def start
@@ -49,28 +52,35 @@ module Fluent
       end
 
       def on_timer
-        log = { "url" => @url }
+        record = { "url" => @url }
 
         begin
           res = RestClient::Request.execute(method: :get,
                                             url: @url,
                                             timeout: @timeout)
-          log["status"] = res.code
-          log["body"] = res.body
+          record["status"] = res.code
+          record["body"] = res.body
         rescue StandardError => err
           if err.respond_to? :http_code
-            log["status"] = err.http_code || 0
+            record["status"] = err.http_code || 0
           else
-            log["status"] = 0
+            record["status"] = 0
           end
 
-          log["error"] = err.message
+          record["error"] = err.message
         end
 
-        log["message"] = JSON.parse(log["body"]) if !@status_only && log["body"] != nil
-        log.delete("body")
+        record_time = Engine.now
 
-        router.emit(@tag, Engine.now, log)
+        if !@status_only && record["body"] != nil
+          @parser.parse(record["body"]) do |time, message|
+            record["message"] = message
+            record_time = time
+          end
+        end
+
+        record.delete("body")
+        router.emit(@tag, record_time, record)
       end
 
       def shutdown

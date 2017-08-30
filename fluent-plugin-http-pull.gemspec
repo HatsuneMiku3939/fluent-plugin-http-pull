@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name    = "fluent-plugin-http-pull"
-  spec.version = "0.2.1"
+  spec.version = "0.3.0"
   spec.authors = ["filepang"]
   spec.email   = ["filepang@gmail.com"]
 
@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov", "~> 0.7"
   spec.add_development_dependency "test-unit", "~> 3.0"
   spec.add_development_dependency "test-unit-rr", "~> 1.0", "~> 1.0.2"
-  spec.add_development_dependency "coveralls"
+  spec.add_development_dependency "coveralls", "~> 0.7"
 
   spec.add_runtime_dependency "fluentd", [">= 0.14.10", "< 2"]
   spec.add_runtime_dependency "rest-client", [">= 2.0.0", "< 3"]

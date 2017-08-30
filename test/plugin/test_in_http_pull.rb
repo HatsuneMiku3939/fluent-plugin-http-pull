@@ -12,7 +12,9 @@ class HttpPullInputTest < Test::Unit::TestCase
     TEST_DEFAULT_VALUE_CONFIG = %[
       tag test
       url http://127.0.0.1
+
       interval 3s
+      format json
     ]
 
     test 'status_only' do
@@ -37,6 +39,7 @@ class HttpPullInputTest < Test::Unit::TestCase
       timeout 10
 
       interval 3s
+      format none
       status_only true
     ]
 
@@ -46,6 +49,7 @@ class HttpPullInputTest < Test::Unit::TestCase
       timeout 10
 
       interval 5s
+      format json
     ]
 
     setup do
@@ -99,7 +103,9 @@ class HttpPullInputTest < Test::Unit::TestCase
     TEST_REFUSED_CONFIG = %[
       tag test
       url http://127.0.0.1:5927
-      interval 1
+      interval 1s
+
+      format json
     ]
     test "connection refused by remote" do
       d = create_driver TEST_REFUSED_CONFIG
@@ -126,9 +132,10 @@ class HttpPullInputTest < Test::Unit::TestCase
     TEST_TIMEOUT_FAIL_CONFIG = %[
       tag test
       url http://127.0.0.1
-      timeout 2
+      timeout 2s
 
-      interval 3
+      interval 3s
+      format json
     ]
 
     setup do
@@ -145,6 +152,7 @@ class HttpPullInputTest < Test::Unit::TestCase
     test "timeout" do
       d = create_driver TEST_TIMEOUT_FAIL_CONFIG
       assert_equal("test", d.instance.tag)
+      assert_equal(2, d.instance.timeout)
 
       d.run(timeout: 5) do
         sleep 7
