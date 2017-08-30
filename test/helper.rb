@@ -1,3 +1,17 @@
+# simplecov must be loaded before any of target code
+require 'simplecov'
+require 'coveralls'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+])
+
+SimpleCov.start do
+  add_filter '/test/'
+end
+
+# load our target code
 $LOAD_PATH.unshift(File.expand_path("../../", __FILE__))
 require "test-unit"
 require "fluent/test"
