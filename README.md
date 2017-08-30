@@ -43,6 +43,7 @@ $ bundle
   url http://www.google.com
   interval 1s
 
+  format none
   status_only true
 </source>
 
@@ -70,6 +71,8 @@ $ bundle
   tag fluentd.status
   url http://localhost:24220/api/plugins.json
   interval 1s
+
+  format json
 </source>
 
 <match fluentd.status>
@@ -91,6 +94,8 @@ $ bundle
   tag es.cluster.health
   url http://localhost:9200/_cluster/health
   interval 1s
+
+  format json
 </source>
 
 <match es.cluster.health>
@@ -117,13 +122,22 @@ The url of remote server.
 
 The interval time between periodic request.
 
+### format (required)
+
+The format of the response body. Due to limitation of current implement it is
+always required regardless `status_only` option.
+
+`http_pull` uses parse plugin to parse the response body. See
+[parser article](https://docs.fluentd.org/v0.12/articles/parser-plugin-overview)
+for more detail.
+
 ### status_only (bool) (optional, default: false)
 
-If atatus_only is true, body is not parsed.
+If status_only is true, body is not parsed.
 
-### timeout (integer) (optional, default: 10)
+### timeout (time) (optional, default: 10s)
 
-Timeout second of each request.
+The timeout of each request.
 
 ## In case of remote error
 
