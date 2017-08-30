@@ -35,6 +35,8 @@ module Fluent
       config_param :interval, :time
       desc 'status_only'
       config_param :status_only, :bool, default: false
+      desc 'timeout second of each request'
+      config_param :timeout, :integer, default: 10
 
       def configure(conf)
         super
@@ -50,14 +52,18 @@ module Fluent
         log = { "url" => @url }
 
         begin
-          res = RestClient.get(@url)
+          res = RestClient::Request.execute(method: :get,
+                                            url: @url,
+                                            timeout: @timeout)
           log["status"] = res.code
           log["body"] = res.body
-        rescue RestClient::ExceptionWithResponse => err
-          log["status"] = err.code
-          log["error"] = err.message
-        rescue Exception => err
-          log["status"] = 0
+        rescue StandardError => err
+          if err.respond_to? :code
+            log["status"] = err.code
+          else
+            log["status"] = 0
+          end
+
           log["error"] = err.message
         end
 
