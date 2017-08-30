@@ -58,8 +58,8 @@ module Fluent
           log["status"] = res.code
           log["body"] = res.body
         rescue StandardError => err
-          if err.respond_to? :code
-            log["status"] = err.code
+          if err.respond_to? :http_code
+            log["status"] = err.http_code || 0
           else
             log["status"] = 0
           end
