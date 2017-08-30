@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name    = "fluent-plugin-http-pull"
-  spec.version = "0.2.0"
+  spec.version = "0.2.1"
   spec.authors = ["filepang"]
   spec.email   = ["filepang@gmail.com"]
 
