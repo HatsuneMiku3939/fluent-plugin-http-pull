@@ -1,6 +1,7 @@
 # simplecov must be loaded before any of target code
 require 'simplecov'
 require 'coveralls'
+Coveralls.wear!
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
   SimpleCov::Formatter::HTMLFormatter,
