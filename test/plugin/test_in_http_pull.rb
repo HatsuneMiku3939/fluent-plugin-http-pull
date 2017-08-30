@@ -35,7 +35,7 @@ class HttpPullInputTest < Test::Unit::TestCase
       assert_equal "test", d.instance.tag
 
       d.run(timeout: 5) do
-        sleep 5
+        sleep 7
       end
       assert_equal 2, d.events.size
 
@@ -51,7 +51,7 @@ class HttpPullInputTest < Test::Unit::TestCase
       assert_equal "test", d.instance.tag
 
       d.run(timeout: 7) do
-        sleep 7
+        sleep 11
       end
       assert_equal 2, d.events.size
 

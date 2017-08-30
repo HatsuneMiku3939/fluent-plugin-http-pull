@@ -21,62 +21,54 @@ module Fluent
     class HttpPullInput < Fluent::Plugin::Input
       Fluent::Plugin.register_input("http_pull", self)
 
+      helpers :timer
+
+      def initialize
+        super
+      end
+
       desc 'The tag of the event.'
       config_param :tag, :string
-
       desc 'The uri of monitoring target'
       config_param :url, :string
-
-      desc 'The second interval time between periodic request'
-      config_param :interval, :integer
-
+      desc 'The interval time between periodic request'
+      config_param :interval, :time
       desc 'status_only'
       config_param :status_only, :bool, default: false
 
       def configure(conf)
         super
-
-        @shutdown = false
       end
 
       def start
-        @thread = Thread.new(&method(:run))
+        super
+
+        timer_execute(:in_http_pull, @interval, &method(:on_timer))
       end
 
-      def run
-        while !@shutdown
-          ts = Time.now.to_f
+      def on_timer
+        log = { "url" => @url }
 
-          log = { "url" => @url }
-
-          begin
-            res = RestClient.get(@url)
-            log["status"] = res.code
-            log["body"] = res.body
-          rescue RestClient::ExceptionWithResponse => err
-            log["status"] = err.code
-            log["error"] = err.message
-          rescue Exception => err
-            log["status"] = 0
-            log["error"] = err.message
-          end
-
-          log["message"] = JSON.parse(log["body"]) if !@status_only && log["body"] != nil
-          log.delete("body")
-
-          router.emit(@tag, Engine.now, log)
-
-          te = Time.now.to_f
-          delay = @interval - (te - ts)
-          delay = delay > 0 ? delay : 0
-
-          sleep delay
+        begin
+          res = RestClient.get(@url)
+          log["status"] = res.code
+          log["body"] = res.body
+        rescue RestClient::ExceptionWithResponse => err
+          log["status"] = err.code
+          log["error"] = err.message
+        rescue Exception => err
+          log["status"] = 0
+          log["error"] = err.message
         end
+
+        log["message"] = JSON.parse(log["body"]) if !@status_only && log["body"] != nil
+        log.delete("body")
+
+        router.emit(@tag, Engine.now, log)
       end
 
       def shutdown
-        @shutdown = true
-        @thread.join if @thread
+        super
       end
 
     end
