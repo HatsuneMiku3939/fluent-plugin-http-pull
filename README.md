@@ -39,7 +39,7 @@ $ bundle
 
   tag test
   url http://www.google.com
-  interval 1
+  interval 1s
 
   status_only true
 </source>
@@ -67,7 +67,7 @@ $ bundle
 
   tag fluentd.status
   url http://localhost:24220/api/plugins.json
-  interval 1
+  interval 1s
 </source>
 
 <match fluentd.status>
@@ -88,7 +88,7 @@ $ bundle
 
   tag es.cluster.health
   url http://localhost:9200/_cluster/health
-  interval 1
+  interval 1s
 </source>
 
 <match es.cluster.health>
@@ -111,13 +111,17 @@ The tag of the event.
 
 The url of remote server.
 
-### interval (integer) (required)
+### interval (time) (required)
 
-The second interval time between periodic request.
+The interval time between periodic request.
 
 ### status_only (bool) (optional, default: false)
 
 If atatus_only is true, body is not parsed.
+
+### timeout (integer) (optional, default: 10)
+
+Timeout second of each request.
 
 ## In case of remote error
 
