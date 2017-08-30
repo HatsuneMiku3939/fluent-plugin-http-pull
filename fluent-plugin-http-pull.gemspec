@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = test_files
   spec.require_paths = ["lib"]
 
+  spec.required_ruby_version = '>= 2.1'
+
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "simplecov", "~> 0.7"
   spec.add_development_dependency "test-unit", "~> 3.0"
