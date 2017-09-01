@@ -10,6 +10,11 @@ Rake::TestTask.new(:test) do |t|
     FileUtils.rm "stub_server.log"
   end
 
+  if File.exists? "stub_proxy.log"
+    puts "clear stub_proxy.log"
+    FileUtils.rm "stub_proxy.log"
+  end
+
   t.libs.push("lib", "test")
   t.test_files = FileList["test/**/test_*.rb"]
   t.verbose = true

@@ -35,8 +35,15 @@ module Fluent
       config_param :interval, :time
       desc 'status_only'
       config_param :status_only, :bool, default: false
-      desc 'timeout second of each request'
+      desc 'The timeout stime of each request'
       config_param :timeout, :time, default: 10
+      desc 'The HTTP proxy URL to use for each requests'
+      config_param :proxy, :string, default: nil
+
+      desc 'user of basic auth'
+      config_param :user, :string, default: nil
+      desc 'password of basic auth'
+      config_param :password, :string, default: nil
 
       def configure(conf)
         compat_parameters_convert(conf, :parser)
@@ -55,9 +62,13 @@ module Fluent
         record = { "url" => @url }
 
         begin
-          res = RestClient::Request.execute(method: :get,
-                                            url: @url,
-                                            timeout: @timeout)
+          request_options = { method: :get, url: @url, timeout: @timeout }
+
+          request_options[:proxy] = @proxy if @proxy
+          request_options[:user] = @user if @user
+          request_options[:password] = @password if @password
+
+          res = RestClient::Request.execute request_options
           record["status"] = res.code
           record["body"] = res.body
         rescue StandardError => err
