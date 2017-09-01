@@ -21,5 +21,8 @@ require "fluent/test/helpers"
 
 require "test/unit/rr"
 
+# require stub_server
+require "test/helper/stub_server"
+
 Test::Unit::TestCase.include(Fluent::Test::Helpers)
 Test::Unit::TestCase.extend(Fluent::Test::Helpers)
