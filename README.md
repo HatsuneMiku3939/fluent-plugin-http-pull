@@ -139,6 +139,14 @@ If status_only is true, body is not parsed.
 
 The timeout of each request.
 
+### user (string) (optional, default: nil)
+
+The user for basic auth
+
+### password (string) (optional, default: nil)
+
+The password for basic auth
+
 ## In case of remote error
 
 ### Can receive response from remote

@@ -38,6 +38,11 @@ module Fluent
       desc 'timeout second of each request'
       config_param :timeout, :time, default: 10
 
+      desc 'user of basic auth'
+      config_param :user, :string, default: nil
+      desc 'password of basic auth'
+      config_param :password, :string, default: nil
+
       def configure(conf)
         compat_parameters_convert(conf, :parser)
         super
@@ -57,7 +62,8 @@ module Fluent
         begin
           res = RestClient::Request.execute(method: :get,
                                             url: @url,
-                                            timeout: @timeout)
+                                            timeout: @timeout,
+                                            user: @user, password: @password)
           record["status"] = res.code
           record["body"] = res.body
         rescue StandardError => err

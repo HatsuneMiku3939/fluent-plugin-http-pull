@@ -10,6 +10,7 @@ class StubServer
     @server.mount_proc '/timeout', &method(:timeout)
     @server.mount_proc '/internal_error', &method(:internal_error)
     @server.mount_proc '/redirect', &method(:redirect)
+    @server.mount_proc '/protected', &method(:protected)
   end
 
   def start
@@ -69,5 +70,15 @@ class StubServer
 
   def redirect(req, res)
     res.set_redirect WEBrick::HTTPStatus::TemporaryRedirect, "http://127.0.0.1:3939/"
+  end
+
+  def protected(req, res)
+    WEBrick::HTTPAuth.basic_auth(req, res, 'protected') do |user, password|
+      user == 'HatsuneMiku' && password == '3939'
+    end
+
+    res.status = 200
+    res['Content-Type'] = 'application/json'
+    res.body = '{ "status": "OK" }'
   end
 end
