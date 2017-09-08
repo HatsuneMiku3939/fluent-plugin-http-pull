@@ -11,6 +11,7 @@ class StubServer
     @server.mount_proc '/internal_error', &method(:internal_error)
     @server.mount_proc '/redirect', &method(:redirect)
     @server.mount_proc '/protected', &method(:protected)
+    @server.mount_proc '/custom_header', &method(:custom_header)
   end
 
   def start
@@ -76,6 +77,14 @@ class StubServer
     WEBrick::HTTPAuth.basic_auth(req, res, 'protected') do |user, password|
       user == 'HatsuneMiku' && password == '3939'
     end
+
+    res.status = 200
+    res['Content-Type'] = 'application/json'
+    res.body = '{ "status": "OK" }'
+  end
+
+  def custom_header(req, res)
+    res.header["HATSUNE-MIKU"] = req["HATSUNE-MIKU"] if req["HATSUNE-MIKU"]
 
     res.status = 200
     res['Content-Type'] = 'application/json'
