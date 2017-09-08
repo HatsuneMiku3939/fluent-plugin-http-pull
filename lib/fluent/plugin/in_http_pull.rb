@@ -50,11 +50,25 @@ module Fluent
         config_param :header, :string
       end
 
+      config_section :request_header, param_name: :request_headers, multi: true do
+        desc 'The name of request header'
+        config_param :header, :string
+
+        desc 'The value of request header'
+        config_param :value, :string
+      end
+
       def configure(conf)
         compat_parameters_convert(conf, :parser)
         super
 
         @parser = parser_create unless @status_only
+        @_request_headers = @request_headers.map do |section|
+          header = section["header"]
+          value = section["value"]
+
+          [header.to_sym, value]
+        end.to_h
       end
 
       def start
@@ -72,6 +86,7 @@ module Fluent
           request_options[:proxy] = @proxy if @proxy
           request_options[:user] = @user if @user
           request_options[:password] = @password if @password
+          request_options[:headers] = @_request_headers unless @request_headers.empty?
 
           res = RestClient::Request.execute request_options
 
