@@ -45,6 +45,11 @@ module Fluent
       desc 'password of basic auth'
       config_param :password, :string, default: nil
 
+      config_section :response_header, param_name: :response_headers, multi: true do
+        desc 'The name of header to cature from response'
+        config_param :header, :string
+      end
+
       def configure(conf)
         compat_parameters_convert(conf, :parser)
         super
@@ -69,8 +74,17 @@ module Fluent
           request_options[:password] = @password if @password
 
           res = RestClient::Request.execute request_options
+
           record["status"] = res.code
           record["body"] = res.body
+
+          record["header"] = {} unless @response_headers.empty?
+          @response_headers.each do |section|
+            name = section["header"]
+            symbolize_name = name.downcase.gsub(/-/, '_').to_sym
+
+            record["header"][name] = res.headers[symbolize_name]
+          end
         rescue StandardError => err
           if err.respond_to? :http_code
             record["status"] = err.http_code || 0

@@ -453,6 +453,38 @@ class HttpPullInputTest < Test::Unit::TestCase
     end
   end
 
+  sub_test_case "capture response header" do
+    TEST_INTERVAL_3_RES_HEADER_CONFIG = %[
+      tag test
+      url http://127.0.0.1:3939
+
+      interval 3s
+      format json
+
+      <response_header>
+        header Content-Type
+      </response_header>
+    ]
+
+    test 'interval 3' do
+      d = create_driver TEST_INTERVAL_3_RES_HEADER_CONFIG
+      assert_equal("test", d.instance.tag)
+      assert_equal(3, d.instance.interval)
+
+      d.run(timeout: 8) do
+        sleep 7
+      end
+      assert_equal(2, d.events.size)
+
+      d.events.each do |tag, time, record|
+        assert_equal("test", tag)
+
+        assert_equal({"url"=>"http://127.0.0.1:3939","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"Content-Type"=>"application/json"}}, record)
+        assert(time.is_a?(Fluent::EventTime))
+      end
+    end
+  end
+
   private
 
   def create_driver(conf)
