@@ -45,11 +45,30 @@ module Fluent
       desc 'password of basic auth'
       config_param :password, :string, default: nil
 
+      config_section :response_header, param_name: :response_headers, multi: true do
+        desc 'The name of header to cature from response'
+        config_param :header, :string
+      end
+
+      config_section :request_header, param_name: :request_headers, multi: true do
+        desc 'The name of request header'
+        config_param :header, :string
+
+        desc 'The value of request header'
+        config_param :value, :string
+      end
+
       def configure(conf)
         compat_parameters_convert(conf, :parser)
         super
 
         @parser = parser_create unless @status_only
+        @_request_headers = @request_headers.map do |section|
+          header = section["header"]
+          value = section["value"]
+
+          [header.to_sym, value]
+        end.to_h
       end
 
       def start
@@ -67,10 +86,20 @@ module Fluent
           request_options[:proxy] = @proxy if @proxy
           request_options[:user] = @user if @user
           request_options[:password] = @password if @password
+          request_options[:headers] = @_request_headers unless @request_headers.empty?
 
           res = RestClient::Request.execute request_options
+
           record["status"] = res.code
           record["body"] = res.body
+
+          record["header"] = {} unless @response_headers.empty?
+          @response_headers.each do |section|
+            name = section["header"]
+            symbolize_name = name.downcase.gsub(/-/, '_').to_sym
+
+            record["header"][name] = res.headers[symbolize_name]
+          end
         rescue StandardError => err
           if err.respond_to? :http_code
             record["status"] = err.http_code || 0
