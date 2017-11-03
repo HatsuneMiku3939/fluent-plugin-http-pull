@@ -58,6 +58,13 @@ class HttpPullInputTest < Test::Unit::TestCase
 
       assert_equal(nil, d.instance.proxy)
     end
+
+    test 'http_method' do
+      d = create_driver TEST_DEFAULT_VALUE_CONFIG
+      assert_equal("test", d.instance.tag)
+
+      assert_equal(:get, d.instance.http_method)
+    end
   end
 
   sub_test_case "success case" do
@@ -551,6 +558,62 @@ class HttpPullInputTest < Test::Unit::TestCase
         assert_equal("test", tag)
 
         assert_equal({"url"=>"http://127.0.0.1:3939/custom_header","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"HATSUNE-MIKU"=>"3939"}}, record)
+        assert(time.is_a?(Fluent::EventTime))
+      end
+    end
+  end
+
+  sub_test_case "request method" do
+    TEST_INTERVAL_3_POST = %[
+      tag test
+      url http://127.0.0.1:3939/method_post
+
+      interval 3s
+      format json
+      http_method post
+    ]
+
+    TEST_INTERVAL_3_DELETE = %[
+      tag test
+      url http://127.0.0.1:3939/method_delete
+
+      interval 3s
+      format json
+      http_method delete
+    ]
+
+    test 'interval 3 with :post' do
+      d = create_driver TEST_INTERVAL_3_POST
+      assert_equal("test", d.instance.tag)
+      assert_equal(3, d.instance.interval)
+
+      d.run(timeout: 8) do
+        sleep 7
+      end
+      assert_equal(2, d.events.size)
+
+      d.events.each do |tag, time, record|
+        assert_equal("test", tag)
+
+        assert_equal({"url"=>"http://127.0.0.1:3939/method_post","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert(time.is_a?(Fluent::EventTime))
+      end
+    end
+
+    test 'interval 3 with :delete' do
+      d = create_driver TEST_INTERVAL_3_DELETE
+      assert_equal("test", d.instance.tag)
+      assert_equal(3, d.instance.interval)
+
+      d.run(timeout: 8) do
+        sleep 7
+      end
+      assert_equal(2, d.events.size)
+
+      d.events.each do |tag, time, record|
+        assert_equal("test", tag)
+
+        assert_equal({"url"=>"http://127.0.0.1:3939/method_delete","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
