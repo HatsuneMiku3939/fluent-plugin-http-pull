@@ -58,6 +58,13 @@ class HttpPullInputTest < Test::Unit::TestCase
 
       assert_equal(nil, d.instance.proxy)
     end
+
+    test 'http_method' do
+      d = create_driver TEST_DEFAULT_VALUE_CONFIG
+      assert_equal("test", d.instance.tag)
+
+      assert_equal(:get, d.instance.http_method)
+    end
   end
 
   sub_test_case "success case" do

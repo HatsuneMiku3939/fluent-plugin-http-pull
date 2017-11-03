@@ -20,7 +20,6 @@ module Fluent
   module Plugin
     class HttpPullInput < Fluent::Plugin::Input
       Fluent::Plugin.register_input("http_pull", self)
-
       helpers :timer, :parser, :compat_parameters
 
       def initialize
@@ -29,19 +28,28 @@ module Fluent
 
       desc 'The tag of the event.'
       config_param :tag, :string
+
       desc 'The url of monitoring target'
       config_param :url, :string
+
       desc 'The interval time between periodic request'
       config_param :interval, :time
+
       desc 'status_only'
       config_param :status_only, :bool, default: false
-      desc 'The timeout stime of each request'
+
+      desc 'The http method for each request'
+      config_param :http_method, :enum, list: [:get, :post, :delete], default: :get
+
+      desc 'The timeout second of each request'
       config_param :timeout, :time, default: 10
+
       desc 'The HTTP proxy URL to use for each requests'
       config_param :proxy, :string, default: nil
 
       desc 'user of basic auth'
       config_param :user, :string, default: nil
+
       desc 'password of basic auth'
       config_param :password, :string, default: nil
 
@@ -69,6 +77,8 @@ module Fluent
 
           [header.to_sym, value]
         end.to_h
+
+        @http_method = :head if @status_only
       end
 
       def start
@@ -81,7 +91,7 @@ module Fluent
         record = { "url" => @url }
 
         begin
-          request_options = { method: :get, url: @url, timeout: @timeout }
+          request_options = { method: @http_method, url: @url, timeout: @timeout }
 
           request_options[:proxy] = @proxy if @proxy
           request_options[:user] = @user if @user
