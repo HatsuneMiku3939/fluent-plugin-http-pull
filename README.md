@@ -34,6 +34,8 @@ $ bundle
 
 ## Example
 
+You can found more examples in `test/plugin/test_in_http_pull.rb`
+
 ### Monitoring http status code only
 ```
 <source>
@@ -133,7 +135,17 @@ for more detail.
 
 ### status_only (bool) (optional, default: false)
 
-If status_only is true, body is not parsed.
+If `status_only` is true, body is not parsed.
+
+### http_method (enum) (optional, default: :get)
+
+The http request method for each requests. Avaliable options are listed below.
+
+* `get`
+* `post`
+* `delete`
+
+If `status_only` is true, `http_method` was override to `head`
 
 ### timeout (time) (optional, default: 10s)
 
@@ -150,6 +162,14 @@ The user for basic auth
 ### password (string) (optional, default: nil)
 
 The password for basic auth
+
+### response_header (section) (optional, default: nil)
+
+The name of response header for capture.
+
+### request_header (section) (optional, default: nil)
+
+The name, value pair of custom reuqest header.
 
 ## In case of remote error
 
