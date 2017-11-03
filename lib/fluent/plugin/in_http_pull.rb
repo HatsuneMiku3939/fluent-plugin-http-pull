@@ -71,12 +71,14 @@ module Fluent
         super
 
         @parser = parser_create unless @status_only
-        @_request_headers = @request_headers.map do |section|
+        @_request_headers = {
+          "Content-Type" => "application/x-www-form-urlencoded"
+        }.merge(@request_headers.map do |section|
           header = section["header"]
           value = section["value"]
 
           [header.to_sym, value]
-        end.to_h
+        end.to_h)
 
         @http_method = :head if @status_only
       end
@@ -91,12 +93,11 @@ module Fluent
         record = { "url" => @url }
 
         begin
-          request_options = { method: @http_method, url: @url, timeout: @timeout }
+          request_options = { method: @http_method, url: @url, timeout: @timeout, headers: @_request_headers }
 
           request_options[:proxy] = @proxy if @proxy
           request_options[:user] = @user if @user
           request_options[:password] = @password if @password
-          request_options[:headers] = @_request_headers unless @request_headers.empty?
 
           res = RestClient::Request.execute request_options
 
