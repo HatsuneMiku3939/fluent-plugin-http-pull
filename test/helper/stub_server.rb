@@ -1,5 +1,17 @@
 require 'webrick'
 
+class DeleteService < WEBrick::HTTPServlet::AbstractServlet
+  def service(req, res)
+    if req.request_method != "DELETE"
+      res.status = 405
+    else
+      res.status = 200
+      res['Content-Type'] = 'application/json'
+      res.body = '{ "status": "OK" }'
+    end
+  end
+end
+
 class StubServer
   def initialize
     create_server
@@ -12,6 +24,9 @@ class StubServer
     @server.mount_proc '/redirect', &method(:redirect)
     @server.mount_proc '/protected', &method(:protected)
     @server.mount_proc '/custom_header', &method(:custom_header)
+
+    @server.mount_proc '/method_post', &method(:method_post)
+    @server.mount '/method_delete', DeleteService
   end
 
   def start
@@ -90,4 +105,15 @@ class StubServer
     res['Content-Type'] = 'application/json'
     res.body = '{ "status": "OK" }'
   end
+
+  def method_post(req, res)
+    if req.request_method != "POST"
+      res.status = 405
+    else
+      res.status = 200
+      res['Content-Type'] = 'application/json'
+      res.body = '{ "status": "OK" }'
+    end
+  end
 end
+
