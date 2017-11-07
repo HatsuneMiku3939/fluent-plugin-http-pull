@@ -4,17 +4,6 @@ require "fluent/plugin/in_http_pull.rb"
 require 'ostruct'
 
 class HttpPullInputTestDefaultOptions < Test::Unit::TestCase
-  @stub_server = nil
-
-  setup do
-    @stub_server = StubServer.new
-    @stub_server.start
-  end
-
-  teardown do
-    @stub_server.shutdown
-  end
-
   sub_test_case "default value of each options" do
     TEST_DEFAULT_VALUE_CONFIG = %[
       tag test
