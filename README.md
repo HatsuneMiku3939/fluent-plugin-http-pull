@@ -120,6 +120,10 @@ The tag of the event.
 
 The url of remote server.
 
+### agent (string) (optional, default: fluent-plugin-http-pull)
+
+The user agent string of request.
+
 ### interval (time) (required)
 
 The interval time between periodic request.

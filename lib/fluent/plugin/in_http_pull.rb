@@ -35,6 +35,9 @@ module Fluent
       desc 'The interval time between periodic request'
       config_param :interval, :time
 
+      desc 'The user agent string of request'
+      config_param :agent, :string, default: "fluent-plugin-http-pull"
+
       desc 'status_only'
       config_param :status_only, :bool, default: false
 
@@ -72,7 +75,8 @@ module Fluent
 
         @parser = parser_create unless @status_only
         @_request_headers = {
-          "Content-Type" => "application/x-www-form-urlencoded"
+          "Content-Type" => "application/x-www-form-urlencoded",
+          "User-Agent" => @agent
         }.merge(@request_headers.map do |section|
           header = section["header"]
           value = section["value"]

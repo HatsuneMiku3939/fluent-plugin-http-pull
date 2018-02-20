@@ -54,6 +54,13 @@ class HttpPullInputTestDefaultOptions < Test::Unit::TestCase
 
       assert_equal(:get, d.instance.http_method)
     end
+
+    test 'agent' do
+      d = create_driver TEST_DEFAULT_VALUE_CONFIG
+      assert_equal("test", d.instance.tag)
+
+      assert_equal("fluent-plugin-http-pull", d.instance.agent)
+    end
   end
 
   private
