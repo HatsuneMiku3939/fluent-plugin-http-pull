@@ -18,7 +18,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
   sub_test_case "success case" do
     TEST_INTERVAL_3_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939
+      url http://localhost:3939
 
       interval 3s
       format none
@@ -27,7 +27,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
 
     TEST_INTERVAL_5_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939
+      url http://localhost:3939
 
       interval 5s
       format json
@@ -35,7 +35,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
 
     TEST_INTERVAL_3_REDIRECT_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/redirect
+      url http://localhost:3939/redirect
 
       interval 3s
       format json
@@ -54,7 +54,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939","status"=>200}, record)
+        assert_equal({"url"=>"http://localhost:3939","status"=>200}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -72,7 +72,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -90,7 +90,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/redirect","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/redirect","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -99,7 +99,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
   sub_test_case "fail when not 200 OK" do
     TEST_404_INTERVAL_3_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/not_exist
+      url http://localhost:3939/not_exist
 
       interval 3s
       format none
@@ -108,7 +108,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
 
     TEST_500_INTERVAL_3_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/internal_error
+      url http://localhost:3939/internal_error
 
       interval 3s
       format none
@@ -128,7 +128,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal("http://127.0.0.1:3939/not_exist", record["url"])
+        assert_equal("http://localhost:3939/not_exist", record["url"])
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(404, record["status"])
@@ -149,7 +149,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal("http://127.0.0.1:3939/internal_error", record["url"])
+        assert_equal("http://localhost:3939/internal_error", record["url"])
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(500, record["status"])
@@ -161,7 +161,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
   sub_test_case "fail when remote down" do
     TEST_REFUSED_CONFIG = %[
       tag test
-      url http://127.0.0.1:5927
+      url http://localhost:5927
       interval 1s
 
       format json
@@ -178,7 +178,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal("http://127.0.0.1:5927", record["url"])
+        assert_equal("http://localhost:5927", record["url"])
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(0, record["status"])
@@ -190,7 +190,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
   sub_test_case "fail when remote timeout" do
     TEST_TIMEOUT_FAIL_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/timeout
+      url http://localhost:3939/timeout
       timeout 2s
 
       interval 3s
@@ -210,7 +210,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal("http://127.0.0.1:3939/timeout", record["url"])
+        assert_equal("http://localhost:3939/timeout", record["url"])
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(0, record["status"])

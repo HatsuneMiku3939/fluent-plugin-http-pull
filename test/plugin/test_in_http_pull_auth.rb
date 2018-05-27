@@ -18,7 +18,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
   sub_test_case "remote is prtected by basic auth" do
     TEST_AUTH_SUCCESS_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/protected
+      url http://localhost:3939/protected
       timeout 2s
       user HatsuneMiku
       password 3939
@@ -29,7 +29,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
 
     TEST_AUTH_FAIL_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/protected
+      url http://localhost:3939/protected
       timeout 2s
       user HatsuneMiku
       password wrong_password
@@ -40,7 +40,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
 
     TEST_AUTH_FAIL_NOT_GIVEN_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/protected
+      url http://localhost:3939/protected
       timeout 2s
 
       interval 3s
@@ -60,7 +60,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/protected","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/protected","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -78,7 +78,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal("http://127.0.0.1:3939/protected", record["url"])
+        assert_equal("http://localhost:3939/protected", record["url"])
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(401, record["status"])
@@ -99,7 +99,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal("http://127.0.0.1:3939/protected", record["url"])
+        assert_equal("http://localhost:3939/protected", record["url"])
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(401, record["status"])

@@ -112,23 +112,25 @@ You can found more examples in `test/plugin/test_in_http_pull.rb`
 
 ## Configuration
 
-### tag (string) (required)
+### Basic options
+
+#### tag (string) (required)
 
 The tag of the event.
 
-### url (string) (required)
+#### url (string) (required)
 
 The url of remote server.
 
-### agent (string) (optional, default: fluent-plugin-http-pull)
+#### agent (string) (optional, default: fluent-plugin-http-pull)
 
 The user agent string of request.
 
-### interval (time) (required)
+#### interval (time) (required)
 
 The interval time between periodic request.
 
-### format (required)
+#### format (required)
 
 The format of the response body. Due to limitation of current implement it is
 always required regardless `status_only` option.
@@ -137,11 +139,11 @@ always required regardless `status_only` option.
 [parser article](https://docs.fluentd.org/v0.12/articles/parser-plugin-overview)
 for more detail.
 
-### status_only (bool) (optional, default: false)
+#### status_only (bool) (optional, default: false)
 
 If `status_only` is true, body is not parsed.
 
-### http_method (enum) (optional, default: :get)
+###E http_method (enum) (optional, default: :get)
 
 The http request method for each requests. Avaliable options are listed below.
 
@@ -151,29 +153,50 @@ The http request method for each requests. Avaliable options are listed below.
 
 If `status_only` is true, `http_method` was override to `head`
 
-### timeout (time) (optional, default: 10s)
+#### timeout (time) (optional, default: 10s)
 
 The timeout of each request.
 
-### proxy (string) (optional, default: nil)
+### Proxy options`
+
+#### proxy (string) (optional, default: nil)
 
 The HTTP proxy URL to use for each requests
 
-### user (string) (optional, default: nil)
+### Basic auth options
+
+#### user (string) (optional, default: nil)
 
 The user for basic auth
 
-### password (string) (optional, default: nil)
+#### password (string) (optional, default: nil)
 
 The password for basic auth
 
-### response_header (section) (optional, default: nil)
+### Req/Resp header options
+
+#### response_header (section) (optional, default: nil)
 
 The name of response header for capture.
 
-### request_header (section) (optional, default: nil)
+#### request_header (section) (optional, default: nil)
 
 The name, value pair of custom reuqest header.
+
+### SSL options
+
+#### verify_ssl (bool) (optional, default: true)
+
+When false, SSL verification is ignored.
+
+#### ca_path (string) (optional, defualt: nil)
+
+The absolute path of directory where ca_file stored. Should be used with `ca_file`.
+
+#### ca_file (string) (optional, defualt: nil)
+
+The Absolute path of ca_file. Should be used with `ca_path`.
+
 
 ## In case of remote error
 

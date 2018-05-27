@@ -18,8 +18,8 @@ class HttpPullInputTestProxy < Test::Unit::TestCase
   sub_test_case "success case behind proxy" do
     TEST_INTERVAL_3_PROXY_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939
-      proxy http://127.0.0.1:4040
+      url http://localhost:3939
+      proxy http://localhost:4040
 
       interval 3s
       format none
@@ -28,8 +28,8 @@ class HttpPullInputTestProxy < Test::Unit::TestCase
 
     TEST_INTERVAL_3_REDIRECT_PROXY_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/redirect
-      proxy http://127.0.0.1:4040
+      url http://localhost:3939/redirect
+      proxy http://localhost:4040
 
       interval 3s
       format json
@@ -37,8 +37,8 @@ class HttpPullInputTestProxy < Test::Unit::TestCase
 
     TEST_AUTH_SUCCESS_PROXY_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/protected
-      proxy http://127.0.0.1:4040
+      url http://localhost:3939/protected
+      proxy http://localhost:4040
       timeout 2s
       user HatsuneMiku
       password 3939
@@ -69,7 +69,7 @@ class HttpPullInputTestProxy < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939","status"=>200}, record)
+        assert_equal({"url"=>"http://localhost:3939","status"=>200}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -87,7 +87,7 @@ class HttpPullInputTestProxy < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/redirect","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/redirect","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -105,7 +105,7 @@ class HttpPullInputTestProxy < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/protected","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/protected","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end

@@ -18,7 +18,7 @@ class HttpPullInputTestHttpHeader < Test::Unit::TestCase
   sub_test_case "capture response header" do
     TEST_INTERVAL_3_RES_HEADER_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939
+      url http://localhost:3939
 
       interval 3s
       format json
@@ -30,7 +30,7 @@ class HttpPullInputTestHttpHeader < Test::Unit::TestCase
 
     TEST_INTERVAL_3_RES_MULTI_HEADER_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939
+      url http://localhost:3939
 
       interval 3s
       format json
@@ -57,7 +57,7 @@ class HttpPullInputTestHttpHeader < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"Content-Type"=>"application/json"}}, record)
+        assert_equal({"url"=>"http://localhost:3939","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"Content-Type"=>"application/json"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -75,7 +75,7 @@ class HttpPullInputTestHttpHeader < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"Content-Type"=>"application/json","Content-Length"=>"18"}}, record)
+        assert_equal({"url"=>"http://localhost:3939","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"Content-Type"=>"application/json","Content-Length"=>"18"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -84,7 +84,7 @@ class HttpPullInputTestHttpHeader < Test::Unit::TestCase
   sub_test_case "custom request header" do
     TEST_INTERVAL_3_CUSTOM_HEADER_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939/custom_header
+      url http://localhost:3939/custom_header
 
       interval 3s
       format json
@@ -112,7 +112,7 @@ class HttpPullInputTestHttpHeader < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/custom_header","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"HATSUNE-MIKU"=>"3939"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/custom_header","status"=>200,"message"=>{"status"=>"OK"},"header"=>{"HATSUNE-MIKU"=>"3939"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
