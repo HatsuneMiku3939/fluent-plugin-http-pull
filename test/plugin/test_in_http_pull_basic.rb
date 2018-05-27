@@ -163,6 +163,7 @@ class HttpPullInputTestBasic < Test::Unit::TestCase
       tag test
       url http://localhost:5927
       interval 1s
+      timeout 1s
 
       format json
     ]
