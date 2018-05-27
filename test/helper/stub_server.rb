@@ -1,4 +1,5 @@
 require 'webrick'
+require 'webrick/https'
 
 class DeleteService < WEBrick::HTTPServlet::AbstractServlet
   def service(req, res)
@@ -13,7 +14,10 @@ class DeleteService < WEBrick::HTTPServlet::AbstractServlet
 end
 
 class StubServer
-  def initialize
+  def initialize(port=3939, ssl_enable=false)
+    @port = port
+    @ssl_enable = ssl_enable
+
     create_server
 
     # mount handler
@@ -57,7 +61,19 @@ class StubServer
       [@log_file, WEBrick::AccessLog::COMBINED_LOG_FORMAT],
     ]
 
-    @server = WEBrick::HTTPServer.new :Port => 3939, :Logger => @log, :AccessLog => @access_log
+
+    if @ssl_enable
+      ssl_basepath = File.join(File.dirname(__FILE__), ".ssl")
+      @server = WEBrick::HTTPServer.new :Port => @port,
+        :SSLEnable => true,
+        :Logger => @log, :AccessLog => @access_log,
+        :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.open(File.join(ssl_basepath, "server.key")).read),
+        :SSLCertificate => OpenSSL::X509::Certificate.new(File.open(File.join(ssl_basepath, "server.crt")).read),
+        :SSLCertName => [["CN", "localhost"]]
+    else
+      @server = WEBrick::HTTPServer.new :Port => @port,
+        :Logger => @log, :AccessLog => @access_log
+    end
   end
 
   def ok(req, res)
@@ -116,4 +132,3 @@ class StubServer
     end
   end
 end
-

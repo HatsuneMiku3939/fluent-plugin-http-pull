@@ -18,7 +18,7 @@ class HttpPullInputTestRequestMethod < Test::Unit::TestCase
   sub_test_case "request method" do
     TEST_INTERVAL_3_POST = %[
       tag test
-      url http://127.0.0.1:3939/method_post
+      url http://localhost:3939/method_post
 
       interval 3s
       format json
@@ -27,7 +27,7 @@ class HttpPullInputTestRequestMethod < Test::Unit::TestCase
 
     TEST_INTERVAL_3_DELETE = %[
       tag test
-      url http://127.0.0.1:3939/method_delete
+      url http://localhost:3939/method_delete
 
       interval 3s
       format json
@@ -47,7 +47,7 @@ class HttpPullInputTestRequestMethod < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/method_post","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/method_post","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
@@ -65,7 +65,7 @@ class HttpPullInputTestRequestMethod < Test::Unit::TestCase
       d.events.each do |tag, time, record|
         assert_equal("test", tag)
 
-        assert_equal({"url"=>"http://127.0.0.1:3939/method_delete","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({"url"=>"http://localhost:3939/method_delete","status"=>200, "message"=>{"status"=>"OK"}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end

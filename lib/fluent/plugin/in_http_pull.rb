@@ -26,6 +26,7 @@ module Fluent
         super
       end
 
+      # basic options
       desc 'The tag of the event.'
       config_param :tag, :string
 
@@ -47,15 +48,18 @@ module Fluent
       desc 'The timeout second of each request'
       config_param :timeout, :time, default: 10
 
+      # proxy options
       desc 'The HTTP proxy URL to use for each requests'
       config_param :proxy, :string, default: nil
 
+      # basic auth options
       desc 'user of basic auth'
       config_param :user, :string, default: nil
 
       desc 'password of basic auth'
       config_param :password, :string, default: nil
 
+      # req/res header options
       config_section :response_header, param_name: :response_headers, multi: true do
         desc 'The name of header to cature from response'
         config_param :header, :string
@@ -68,6 +72,17 @@ module Fluent
         desc 'The value of request header'
         config_param :value, :string
       end
+
+      # ssl options
+      desc 'verify_ssl'
+      config_param :verify_ssl, :bool, default: true
+
+      desc "The absolute path of directory where ca_file stored"
+      config_param :ca_path, :string, default: nil
+
+      desc "The absolute path of ca_file"
+      config_param :ca_file, :string, default: nil
+
 
       def configure(conf)
         compat_parameters_convert(conf, :parser)
@@ -102,6 +117,12 @@ module Fluent
           request_options[:proxy] = @proxy if @proxy
           request_options[:user] = @user if @user
           request_options[:password] = @password if @password
+
+          request_options[:verify_ssl] = @verify_ssl
+          if @verify_ssl and @ca_path and @ca_file
+            request_options[:ssl_ca_path] = @ca_path
+            request_options[:ssl_ca_file] = @ca_file
+          end
 
           res = RestClient::Request.execute request_options
 

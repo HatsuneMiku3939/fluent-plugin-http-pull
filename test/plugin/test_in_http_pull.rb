@@ -7,7 +7,7 @@ class HttpPullInputTestDefaultOptions < Test::Unit::TestCase
   sub_test_case "default value of each options" do
     TEST_DEFAULT_VALUE_CONFIG = %[
       tag test
-      url http://127.0.0.1:3939
+      url http://localhost:3939
 
       interval 3s
       format json
@@ -60,6 +60,27 @@ class HttpPullInputTestDefaultOptions < Test::Unit::TestCase
       assert_equal("test", d.instance.tag)
 
       assert_equal("fluent-plugin-http-pull", d.instance.agent)
+    end
+
+    test 'verify_ssl' do
+      d = create_driver TEST_DEFAULT_VALUE_CONFIG
+      assert_equal("test", d.instance.tag)
+
+      assert_equal(true, d.instance.verify_ssl)
+    end
+
+    test 'ca_path' do
+      d = create_driver TEST_DEFAULT_VALUE_CONFIG
+      assert_equal("test", d.instance.tag)
+
+      assert_equal(nil, d.instance.ca_path)
+    end
+
+    test 'ca_file' do
+      d = create_driver TEST_DEFAULT_VALUE_CONFIG
+      assert_equal("test", d.instance.tag)
+
+      assert_equal(nil, d.instance.ca_file)
     end
   end
 
