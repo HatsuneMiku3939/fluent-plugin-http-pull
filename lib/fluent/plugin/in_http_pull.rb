@@ -57,7 +57,7 @@ module Fluent
       config_param :user, :string, default: nil
 
       desc 'password of basic auth'
-      config_param :password, :string, default: nil
+      config_param :password, :string, default: nil, secret: true
 
       # req/res header options
       config_section :response_header, param_name: :response_headers, multi: true do
