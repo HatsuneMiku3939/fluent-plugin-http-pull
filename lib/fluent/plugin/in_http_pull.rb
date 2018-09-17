@@ -109,53 +109,24 @@ module Fluent
       end
 
       def on_timer
-        record = { "url" => @url }
+        body = nil
+        record = nil
 
         begin
-          request_options = { method: @http_method, url: @url, timeout: @timeout, headers: @_request_headers }
-
-          request_options[:proxy] = @proxy if @proxy
-          request_options[:user] = @user if @user
-          request_options[:password] = @password if @password
-
-          request_options[:verify_ssl] = @verify_ssl
-          if @verify_ssl and @ca_path and @ca_file
-            request_options[:ssl_ca_path] = @ca_path
-            request_options[:ssl_ca_file] = @ca_file
-          end
-
           res = RestClient::Request.execute request_options
+          record, body = get_record(res)
 
-          record["status"] = res.code
-          record["body"] = res.body
-
-          record["header"] = {} unless @response_headers.empty?
-          @response_headers.each do |section|
-            name = section["header"]
-            symbolize_name = name.downcase.gsub(/-/, '_').to_sym
-
-            record["header"][name] = res.headers[symbolize_name]
-          end
         rescue StandardError => err
+          record = { "url" => @url, "error" => err.message }
           if err.respond_to? :http_code
             record["status"] = err.http_code || 0
           else
             record["status"] = 0
           end
-
-          record["error"] = err.message
         end
 
         record_time = Engine.now
-
-        if !@status_only && record["body"] != nil
-          @parser.parse(record["body"]) do |time, message|
-            record["message"] = message
-            record_time = time
-          end
-        end
-
-        record.delete("body")
+        record = parse(record, body)
         router.emit(@tag, record_time, record)
       end
 
@@ -163,6 +134,47 @@ module Fluent
         super
       end
 
+      private
+      def request_options
+        options = { method: @http_method, url: @url, timeout: @timeout, headers: @_request_headers }
+
+        options[:proxy] = @proxy if @proxy
+        options[:user] = @user if @user
+        options[:password] = @password if @password
+
+        options[:verify_ssl] = @verify_ssl
+        if @verify_ssl and @ca_path and @ca_file
+          options[:ssl_ca_path] = @ca_path
+          options[:ssl_ca_file] = @ca_file
+        end
+
+        return options
+      end
+
+      def get_record(response)
+        body = response.body
+        record = { "url" => @url, "status" => response.code }
+        record["header"] = {} unless @response_headers.empty?
+        @response_headers.each do |section|
+          name = section["header"]
+          symbolize_name = name.downcase.gsub(/-/, '_').to_sym
+
+          record["header"][name] = response.headers[symbolize_name]
+        end
+
+        return record, body
+      end
+
+      def parse(record, body)
+        if !@status_only && body != nil
+          @parser.parse(body) do |time, message|
+            record["message"] = message
+            record_time = time
+          end
+        end
+
+        return record
+      end
     end
   end
 end
