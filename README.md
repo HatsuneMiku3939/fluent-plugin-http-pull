@@ -4,6 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/k91x4jyhahoo2it3?svg=true)](https://ci.appveyor.com/project/HatsuneMiku3939/fluent-plugin-http-pull)
 [![Gem Version](https://badge.fury.io/rb/fluent-plugin-http-pull.svg)](https://badge.fury.io/rb/fluent-plugin-http-pull)
 [![Coverage Status](https://coveralls.io/repos/github/HatsuneMiku3939/fluent-plugin-http-pull/badge.svg?branch=master)](https://coveralls.io/github/HatsuneMiku3939/fluent-plugin-http-pull?branch=master)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FHatsuneMiku3939%2Ffluent-plugin-http-pull.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FHatsuneMiku3939%2Ffluent-plugin-http-pull?ref=badge_shield)
 
 
 [Fluentd](http://fluentd.org/) input plugin to pull log from rest api.
@@ -372,3 +373,7 @@ The absolute path of ca_file. Should be used with `ca_path`.
 * Copyright(c) 2017- filepang
 * License
 	* Apache License, Version 2.0
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FHatsuneMiku3939%2Ffluent-plugin-http-pull.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FHatsuneMiku3939%2Ffluent-plugin-http-pull?ref=badge_large)
