@@ -1,5 +1,5 @@
-require "helper"
-require "fluent/plugin/in_http_pull.rb"
+require 'helper'
+require 'fluent/plugin/in_http_pull.rb'
 
 require 'ostruct'
 
@@ -15,7 +15,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
     @stub_server.shutdown
   end
 
-  sub_test_case "remote is prtected by basic auth" do
+  sub_test_case 'remote is prtected by basic auth' do
     TEST_AUTH_SUCCESS_CONFIG = %[
       tag test
       url http://localhost:3939/protected
@@ -49,7 +49,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
 
     test 'interval 3 with corrent password' do
       d = create_driver TEST_AUTH_SUCCESS_CONFIG
-      assert_equal("test", d.instance.tag)
+      assert_equal('test', d.instance.tag)
       assert_equal(3, d.instance.interval)
 
       d.run(timeout: 8) do
@@ -58,16 +58,16 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
       assert_equal(2, d.events.size)
 
       d.events.each do |tag, time, record|
-        assert_equal("test", tag)
+        assert_equal('test', tag)
 
-        assert_equal({"url"=>"http://localhost:3939/protected","status"=>200, "message"=>{"status"=>"OK"}}, record)
+        assert_equal({'url'=>'http://localhost:3939/protected','status'=>200, 'message'=>{'status'=>'OK'}}, record)
         assert(time.is_a?(Fluent::EventTime))
       end
     end
 
     test 'interval 3 with wrong password' do
       d = create_driver TEST_AUTH_FAIL_CONFIG
-      assert_equal("test", d.instance.tag)
+      assert_equal('test', d.instance.tag)
       assert_equal(3, d.instance.interval)
 
       d.run(timeout: 8) do
@@ -76,19 +76,19 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
       assert_equal(2, d.events.size)
 
       d.events.each do |tag, time, record|
-        assert_equal("test", tag)
+        assert_equal('test', tag)
 
-        assert_equal("http://localhost:3939/protected", record["url"])
+        assert_equal('http://localhost:3939/protected', record['url'])
         assert(time.is_a?(Fluent::EventTime))
 
-        assert_equal(401, record["status"])
-        assert_not_nil(record["error"])
+        assert_equal(401, record['status'])
+        assert_not_nil(record['error'])
       end
     end
 
     test 'interval 3 without auth info' do
       d = create_driver TEST_AUTH_FAIL_CONFIG
-      assert_equal("test", d.instance.tag)
+      assert_equal('test', d.instance.tag)
       assert_equal(3, d.instance.interval)
 
       d.run(timeout: 8) do
@@ -97,13 +97,13 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
       assert_equal(2, d.events.size)
 
       d.events.each do |tag, time, record|
-        assert_equal("test", tag)
+        assert_equal('test', tag)
 
-        assert_equal("http://localhost:3939/protected", record["url"])
+        assert_equal('http://localhost:3939/protected', record['url'])
         assert(time.is_a?(Fluent::EventTime))
 
-        assert_equal(401, record["status"])
-        assert_not_nil(record["error"])
+        assert_equal(401, record['status'])
+        assert_not_nil(record['error'])
       end
     end
   end

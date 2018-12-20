@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "fluent/plugin/input"
-require "rest-client"
+require 'fluent/plugin/input'
+require 'rest-client'
 
 module Fluent
   module Plugin
     class HttpPullInput < Fluent::Plugin::Input
-      Fluent::Plugin.register_input("http_pull", self)
+      Fluent::Plugin.register_input('http_pull', self)
       helpers :timer, :parser, :compat_parameters
 
       def initialize
@@ -37,7 +37,7 @@ module Fluent
       config_param :interval, :time
 
       desc 'The user agent string of request'
-      config_param :agent, :string, default: "fluent-plugin-http-pull"
+      config_param :agent, :string, default: 'fluent-plugin-http-pull'
 
       desc 'status_only'
       config_param :status_only, :bool, default: false
@@ -77,10 +77,10 @@ module Fluent
       desc 'verify_ssl'
       config_param :verify_ssl, :bool, default: true
 
-      desc "The absolute path of directory where ca_file stored"
+      desc 'The absolute path of directory where ca_file stored'
       config_param :ca_path, :string, default: nil
 
-      desc "The absolute path of ca_file"
+      desc 'The absolute path of ca_file'
       config_param :ca_file, :string, default: nil
 
 
@@ -90,11 +90,11 @@ module Fluent
 
         @parser = parser_create unless @status_only
         @_request_headers = {
-          "Content-Type" => "application/x-www-form-urlencoded",
-          "User-Agent" => @agent
+          'Content-Type' => 'application/x-www-form-urlencoded',
+          'User-Agent' => @agent
         }.merge(@request_headers.map do |section|
-          header = section["header"]
-          value = section["value"]
+          header = section['header']
+          value = section['value']
 
           [header.to_sym, value]
         end.to_h)
@@ -117,11 +117,11 @@ module Fluent
           record, body = get_record(res)
 
         rescue StandardError => err
-          record = { "url" => @url, "error" => err.message }
+          record = { 'url' => @url, 'error' => err.message }
           if err.respond_to? :http_code
-            record["status"] = err.http_code || 0
+            record['status'] = err.http_code || 0
           else
-            record["status"] = 0
+            record['status'] = 0
           end
         end
 
@@ -153,13 +153,13 @@ module Fluent
 
       def get_record(response)
         body = response.body
-        record = { "url" => @url, "status" => response.code }
-        record["header"] = {} unless @response_headers.empty?
+        record = { 'url' => @url, 'status' => response.code }
+        record['header'] = {} unless @response_headers.empty?
         @response_headers.each do |section|
-          name = section["header"]
+          name = section['header']
           symbolize_name = name.downcase.gsub(/-/, '_').to_sym
 
-          record["header"][name] = response.headers[symbolize_name]
+          record['header'][name] = response.headers[symbolize_name]
         end
 
         return record, body
@@ -168,7 +168,7 @@ module Fluent
       def parse(record, body)
         if !@status_only && body != nil
           @parser.parse(body) do |time, message|
-            record["message"] = message
+            record['message'] = message
             record_time = time
           end
         end

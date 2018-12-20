@@ -3,7 +3,7 @@ require 'webrick/https'
 
 class DeleteService < WEBrick::HTTPServlet::AbstractServlet
   def service(req, res)
-    if req.request_method != "DELETE"
+    if req.request_method != 'DELETE'
       res.status = 405
     else
       res.status = 200
@@ -55,7 +55,7 @@ class StubServer
 
   private
   def create_server
-    @log_file = File.open("stub_server.log", "a+")
+    @log_file = File.open('stub_server.log', 'a+')
     @log = WEBrick::Log.new @log_file
     @access_log = [
       [@log_file, WEBrick::AccessLog::COMBINED_LOG_FORMAT],
@@ -63,13 +63,13 @@ class StubServer
 
 
     if @ssl_enable
-      ssl_basepath = File.join(File.dirname(__FILE__), ".ssl")
+      ssl_basepath = File.join(File.dirname(__FILE__), '.ssl')
       @server = WEBrick::HTTPServer.new :Port => @port,
         :SSLEnable => true,
         :Logger => @log, :AccessLog => @access_log,
-        :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.open(File.join(ssl_basepath, "server.key")).read),
-        :SSLCertificate => OpenSSL::X509::Certificate.new(File.open(File.join(ssl_basepath, "server.crt")).read),
-        :SSLCertName => [["CN", "localhost"]]
+        :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.open(File.join(ssl_basepath, 'server.key')).read),
+        :SSLCertificate => OpenSSL::X509::Certificate.new(File.open(File.join(ssl_basepath, 'server.crt')).read),
+        :SSLCertName => [['CN', 'localhost']]
     else
       @server = WEBrick::HTTPServer.new :Port => @port,
         :Logger => @log, :AccessLog => @access_log
@@ -101,7 +101,7 @@ class StubServer
   end
 
   def redirect(req, res)
-    res.set_redirect WEBrick::HTTPStatus::TemporaryRedirect, "http://127.0.0.1:3939/"
+    res.set_redirect WEBrick::HTTPStatus::TemporaryRedirect, 'http://127.0.0.1:3939/'
   end
 
   def protected(req, res)
@@ -115,7 +115,7 @@ class StubServer
   end
 
   def custom_header(req, res)
-    res.header["HATSUNE-MIKU"] = req["HATSUNE-MIKU"] if req["HATSUNE-MIKU"]
+    res.header['HATSUNE-MIKU'] = req['HATSUNE-MIKU'] if req['HATSUNE-MIKU']
 
     res.status = 200
     res['Content-Type'] = 'application/json'
@@ -123,7 +123,7 @@ class StubServer
   end
 
   def method_post(req, res)
-    if req.request_method != "POST"
+    if req.request_method != 'POST'
       res.status = 405
     else
       res.status = 200
