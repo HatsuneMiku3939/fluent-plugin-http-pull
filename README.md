@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/HatsuneMiku3939/fluent-plugin-http-pull.svg?branch=master)](https://travis-ci.org/HatsuneMiku3939/fluent-plugin-http-pull)
 [![Build status](https://ci.appveyor.com/api/projects/status/k91x4jyhahoo2it3?svg=true)](https://ci.appveyor.com/project/HatsuneMiku3939/fluent-plugin-http-pull)
 [![Gem Version](https://badge.fury.io/rb/fluent-plugin-http-pull.svg)](https://badge.fury.io/rb/fluent-plugin-http-pull)
+[![Gem Downloads](https://img.shields.io/gem/dt/fluent-plugin-http-pull)](https://img.shields.io/gem/dt/fluent-plugin-http-pull)
 [![Coverage Status](https://coveralls.io/repos/github/HatsuneMiku3939/fluent-plugin-http-pull/badge.svg?branch=master)](https://coveralls.io/github/HatsuneMiku3939/fluent-plugin-http-pull?branch=master)
 
 
