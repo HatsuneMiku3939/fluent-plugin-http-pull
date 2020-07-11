@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require "fluent/log"
 require "fluent/plugin/input"
 require "rest-client"
 
@@ -32,6 +33,18 @@ module Fluent
 
       desc 'The url of monitoring target'
       config_param :url, :string
+
+      desc 'The path of monitoring target'
+      config_param :path, :string, default: nil
+
+      desc 'Payload to query target'
+      config_param :payload, :hash, default: nil
+
+      desc 'Message key'
+      config_param :event_key, :string, default: nil
+
+      desc 'Response contains multiple events'
+      config_param :multi_event, :bool, default: false
 
       desc 'The interval time between periodic request'
       config_param :interval, :time
@@ -58,6 +71,13 @@ module Fluent
 
       desc 'password of basic auth'
       config_param :password, :string, default: nil, secret: true
+
+      # login session
+      desc 'login path'
+      config_param :login_path, :string, default: nil
+
+      desc 'login payload'
+      config_param :login_payload, :hash, default: nil
 
       # req/res header options
       config_section :response_header, param_name: :response_headers, multi: true do
@@ -88,6 +108,9 @@ module Fluent
         compat_parameters_convert(conf, :parser)
         super
 
+        if (@login_path && !@login_payload ) || (!@login_path && @login_payload)
+          raise Fluent::ConfigError, "login_path and login_payload should be both set or unset"
+        end
         @parser = parser_create unless @status_only
         @_request_headers = {
           "Content-Type" => "application/x-www-form-urlencoded",
@@ -111,23 +134,34 @@ module Fluent
       def on_timer
         body = nil
         record = nil
+        record_time = Engine.now
+        emit_stream = Fluent::MultiEventStream.new
+        site = RestClient::Resource.new(@url, request_options)
 
         begin
-          res = RestClient::Request.execute request_options
-          record, body = get_record(res)
+          cookies = get_session_cookie(site)
 
+          site = site[@path] if @path
+          if @payload
+            res = site.method(@http_method).call(@payload.to_json, :cookies=>cookies)
+          else
+            res = site.method(@http_method).call(:cookie=>cookies)
+          end
+
+          record, body = get_record(res, site.url)
+          process_events(record, body, emit_stream)
         rescue StandardError => err
-          record = { "url" => @url, "error" => err.message }
+          record = { "url" => site.url, "error" => err.message }
           if err.respond_to? :http_code
             record["status"] = err.http_code || 0
           else
             record["status"] = 0
           end
+          log.error(record)
+          emit_stream.add(record_time, record)
         end
 
-        record_time = Engine.now
-        record = parse(record, body)
-        router.emit(@tag, record_time, record)
+        router.emit_stream(@tag, emit_stream)
       end
 
       def shutdown
@@ -136,7 +170,7 @@ module Fluent
 
       private
       def request_options
-        options = { method: @http_method, url: @url, timeout: @timeout, headers: @_request_headers }
+        options = { timeout: @timeout, headers: @_request_headers }
 
         options[:proxy] = @proxy if @proxy
         options[:user] = @user if @user
@@ -151,9 +185,23 @@ module Fluent
         return options
       end
 
-      def get_record(response)
+      def get_session_cookie(resource)
+        cookies = {}
+        return cookies unless @login_path and @login_payload
+
+        login_response = resource[@login_path].post(@login_payload.to_json)
+        if login_response.code != 200
+          raise RestClient::ExceptionWithResponse.new(nil, login_response.code)
+        else
+          cookies = login_response.cookie_jar
+        end
+
+        return cookies
+      end
+
+      def get_record(response, url)
         body = response.body
-        record = { "url" => @url, "status" => response.code }
+        record = { "url" => url, "status" => response.code }
         record["header"] = {} unless @response_headers.empty?
         @response_headers.each do |section|
           name = section["header"]
@@ -161,20 +209,37 @@ module Fluent
 
           record["header"][name] = response.headers[symbolize_name]
         end
-
         return record, body
       end
 
-      def parse(record, body)
-        if !@status_only && body != nil
-          @parser.parse(body) do |time, message|
-            record["message"] = message
-            record_time = time
-          end
-        end
+      def process_events(record, body, es)
 
-        return record
+        return es.add(Engine.now, record) if @status_only or body == nil
+
+        # consume errors produced by parser by logging it
+        begin
+          @parser.parse(body) do |time, events|
+
+            events = events[@event_key] if @multi_event and @event_key || []
+
+            # if @event_key not found, events will be converted to empty Array.
+            log.warning("event_key '#{@event_key}' not found") if events == []
+
+            # if each query result is a record, covert it to array.
+            events = [ events ] unless @multi_event
+
+            events.each do |event|
+              item = record.dup
+              item['message'] = event
+              es.add(time, item)
+            end
+          end
+        rescue StandardError => err
+          log.error("Failed to process result with error: #{err}")
+          log.debug("Failed to parse #{body}")
+        end
       end
+
     end
   end
 end
