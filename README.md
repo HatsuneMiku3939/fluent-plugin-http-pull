@@ -180,7 +180,7 @@ For example, login url is https://localhost:8080/login, query url is https://loc
 	path search
 	interval 1s
 
-	login_path lobin
+	login_path login
 	login_payload {"username":"tester","password":"drowssaP"}
 	verify_ssl false
 
@@ -232,7 +232,7 @@ If the expected items are encapsulated in json structure, for example,
 
 ```
 {"meta": {"server": "localhost"},
-  "iterms": [
+  "items": [
     {"message": "message 1"},
     {"message": "message 2"}
    ]
