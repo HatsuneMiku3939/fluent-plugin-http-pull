@@ -30,7 +30,12 @@ class StubServer
     @server.mount_proc '/custom_header', &method(:custom_header)
 
     @server.mount_proc '/method_post', &method(:method_post)
+
+    @server.mount_proc '/login', &method(:login)
+    @server.mount_proc '/session_events', &method(:session_events)
+
     @server.mount '/method_delete', DeleteService
+
   end
 
   def start
@@ -131,4 +136,21 @@ class StubServer
       res.body = '{ "status": "OK" }'
     end
   end
+
+  def login(req, res)
+    if req.body and JSON.parse(req.body) == {"username"=>"admin", "password"=>"pwd"}
+      res.status = 200
+      res['Content-Type'] = 'application/json'
+      res.cookies.push WEBrick::Cookie.new("session", "1")
+    else
+      res.status = 401
+    end
+  end
+
+  def session_events(req, res)
+      res.status = 200
+      res['Content-Type'] = 'application/json'
+      res.body = '{"ListMeta":{},"items":[{"kind":"Event","meta":{"name":"1","uuid":"c51d9e82"}},{"kind":"Event","meta":{"name":"2","uuid":"b1b5686d"}}]}'
+  end
+
 end
