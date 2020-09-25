@@ -79,6 +79,7 @@ class HttpPullInputTestAuth < Test::Unit::TestCase
         assert_equal("test", tag)
 
         assert_equal("http://localhost:3939/protected", record["url"])
+        puts "tag=#{tag}, time=#{time}, record=#{record}, time_class=#{time.class}"
         assert(time.is_a?(Fluent::EventTime))
 
         assert_equal(401, record["status"])

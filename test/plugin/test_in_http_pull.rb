@@ -1,5 +1,5 @@
 require "helper"
-require "fluent/plugin/in_http_pull.rb"
+require "fluent/plugin/in_http_pull"
 
 require 'ostruct'
 
