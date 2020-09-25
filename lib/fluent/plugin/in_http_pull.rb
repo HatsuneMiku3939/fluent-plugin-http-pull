@@ -123,6 +123,7 @@ module Fluent
         end.to_h)
 
         @http_method = :head if @status_only
+        @cookies = {}
       end
 
       def start
@@ -136,28 +137,30 @@ module Fluent
         record = nil
         record_time = Engine.now
         emit_stream = Fluent::MultiEventStream.new
-        site = RestClient::Resource.new(@url, request_options)
-
+        base_site = RestClient::Resource.new(@url, request_options)
+        login_site = @login_path ? base_site[@login_path] : base_site
+        query_site = @path ? base_site[@path] : base_site
         begin
-          cookies = get_session_cookie(site)
-
-          site = site[@path] if @path
+          get_session_cookie(login_site)
+        rescue StandardError => err
+          record = log_error(login_site.url, err)
+          emit_stream.add(record_time, record)
+          router.emit_stream(@tag, emit_stream)
+          return
+        end
+        begin
           if @payload
-            res = site.method(@http_method).call(@payload.to_json, :cookies=>cookies)
+            res = query_site.method(@http_method).call(@payload.to_json, :cookies=>@cookies)
           else
-            res = site.method(@http_method).call(:cookie=>cookies)
+            res = query_site.method(@http_method).call(:cookie=>@cookies)
           end
 
-          record, body = get_record(res, site.url)
+          record, body = get_record(res, query_site.url)
           process_events(record, body, emit_stream)
         rescue StandardError => err
-          record = { "url" => site.url, "error" => err.message }
-          if err.respond_to? :http_code
-            record["status"] = err.http_code || 0
-          else
-            record["status"] = 0
-          end
-          log.error(record)
+          record = log_error(query_site.url, err)
+          # reset session cookie if it is expired
+          @cookies = {} if not @cookies.empty? and record["status"] == 401
           emit_stream.add(record_time, record)
         end
 
@@ -169,6 +172,17 @@ module Fluent
       end
 
       private
+      def log_error(url, err)
+        record = { "url" => url, "error" => err.message }
+        if err.respond_to? :http_code
+          record["status"] = err.http_code || 0
+        else
+          record["status"] = 0
+        end
+        log.error(record)
+        return record
+      end
+
       def request_options
         options = { timeout: @timeout, headers: @_request_headers }
 
@@ -186,17 +200,15 @@ module Fluent
       end
 
       def get_session_cookie(resource)
-        cookies = {}
-        return cookies unless @login_path and @login_payload
-
-        login_response = resource[@login_path].post(@login_payload.to_json)
+        @cookies = {} if @cookies.nil?
+        return unless @login_path and @login_payload and @cookies.empty?
+        login_response = resource.post(@login_payload.to_json)
         if login_response.code != 200
           raise RestClient::ExceptionWithResponse.new(nil, login_response.code)
         else
-          cookies = login_response.cookie_jar
+          @cookies = login_response.cookie_jar
         end
 
-        return cookies
       end
 
       def get_record(response, url)
