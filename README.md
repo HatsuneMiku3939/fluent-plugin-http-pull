@@ -155,7 +155,7 @@ You can use `user`, `password` options to provide authentication information.
 
 	format json
 	user foo
-	passwrd bar
+	password bar
 </source>
 
 # 2017-05-17 21:41:47.872951000 +0900 status: {"url":"http://yourinfrastructure/api/status.json","status":200,"message":{ ... }}
