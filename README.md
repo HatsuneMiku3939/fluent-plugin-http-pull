@@ -39,6 +39,7 @@ This plugin will help to gathering status log from these status api.
 	* [verify_ssl](#verify_ssl-bool-optional-default-true)
 	* [ca_path](#ca_path-string-optional-defualt-nil)
 	* [ca_file](#ca_file-string-optional-defualt-nil)
+* [Version Tested](#version-tested)
 * [Copyright](#copyright)
 
 ## Installation
@@ -367,6 +368,18 @@ The absolute path of directory where ca_file stored. Should be used with `ca_fil
 #### ca_file (string) (optional, defualt: nil)
 
 The absolute path of ca_file. Should be used with `ca_path`.
+
+## Version tested
+
+This plugin is tested with the following version combination of ruby and fluentd.
+
+| http_pull | ruby | fluentd    |
+| --------- | ---- | ---------- |
+| <= v0.7.0 | 2.3  | v0.14.x    |
+| v0.8.0    | 2.3  | >= v1.0.0  |
+| v0.8.1    | 2.3  | <= v1.14.4 |
+| v0.8.2    | 2.3  | <= v1.14.4 |
+| v0.8.3    | 2.3  | <= v1.14.4 |
 
 ## Copyright
 
