@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov", "~> 0.7"
   spec.add_development_dependency "test-unit", "~> 3.0"
   spec.add_development_dependency "test-unit-rr", "~> 1.0", "~> 1.0.2"
-  spec.add_development_dependency "coveralls", "~> 0.7"
+  spec.add_development_dependency "solargraph", "~> 0.50.0"
 
   spec.add_runtime_dependency "fluentd", [">= 0.14.10", "< 2"]
   spec.add_runtime_dependency "rest-client", [">= 2.0.0", "< 3"]
