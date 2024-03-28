@@ -18,6 +18,10 @@ This plugin will help to gathering status log from these status api.
 	* [Monitor Status Code](#monitoring-http-status-code-only)
 	* [Override User Agent](#override-user-agent)
 	* [HTTP Basic Auth](#http-basic-auth)
+	* [HTTP Login with Payload](#http-login-with-payload)
+	* [HTTP Pull with Payload](#http-pull-with-payload)
+	* [Multiple Events](#multiple-events)
+	* [Encapsulated items](#encapsulated-items)
 	* [HTTP Proxy](#http-proxy)
 	* [Logging Response Header](#logging-http-response-header)
 	* [Custom Request Header](#custom-request-header)
@@ -160,6 +164,95 @@ You can use `user`, `password` options to provide authentication information.
 </source>
 
 # 2017-05-17 21:41:47.872951000 +0900 status: {"url":"http://yourinfrastructure/api/status.json","status":200,"message":{ ... }}
+```
+
+### HTTP login with payload
+
+If your infrastructure use cookies to manage the login session, and the login path is different to query path, you can use `login_path`, `login_payload`, and `path` options to provide authentication information.
+
+For example, login url is https://localhost:8080/login, query url is https://localhost:8080/search
+
+```
+<source>
+	@type http_pull
+
+	tag status
+	url https://localhost:8080
+	path search
+	interval 1s
+
+	login_path login
+	login_payload {"username":"tester","password":"drowssaP"}
+	verify_ssl false
+
+	format json
+</source>
+```
+
+### HTTP pull with payload
+
+You can send json format `payload` to togather with the query.
+
+```
+<source>
+	@type http_pull
+
+	tag status
+	url https://localhost:8080/search
+	payload {"max-results": 1500}
+
+	interval 1s
+</source>
+```
+
+### Multiple events
+
+If the server returns multiple events per request, for example
+
+```
+[{"message": "message 1"},
+ {"message": "message 2"}]
+```
+This can be handled by specify option `multi_event true`
+
+```
+<source>
+	@type http_pull
+
+	tag status
+	url https://localhost:8080/search
+	multi_event true
+
+	interval 1s
+</source>
+```
+
+### Encapsulated items
+
+If the expected items are encapsulated in json structure, for example,
+
+```
+{"meta": {"server": "localhost"},
+  "items": [
+    {"message": "message 1"},
+    {"message": "message 2"}
+   ]
+}
+```
+
+You can fetch the messages by setting up option `event_key`,
+
+```
+<source>
+	@type http_pull
+
+	tag status
+	url https://localhost:8080/search
+	multi_event true
+	event_key   items
+
+	interval 1s
+</source>
 ```
 
 ### HTTP proxy
@@ -344,6 +437,31 @@ The user for basic auth
 #### password (string) (optional, default: nil)
 
 The password for basic auth
+
+### Authentication Session Configuration
+
+#### login_path (string) (optional, default: nil)
+
+The subpath of the login url.
+
+#### login_payload (hash) (optional, default: nil)
+
+The payload send for authentication.
+Note: login_path and login_payload has to be both nil or both not-nil.
+
+### Request Configuration
+
+#### payload (hash) (optional, default: nil)
+
+The query payload sent to server.
+
+#### multi_event (bool) (optional, default: false)
+
+Whether the response contains multiple events.
+
+#### event_key (string) (optional, default: nil)
+
+The key of the expected items in a json format response.
 
 ### Req/Resp Header Configuration
 
